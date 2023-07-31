@@ -1,0 +1,2 @@
+CREATE DATABASE teddy_ingestion
+AS PERMANENT = 110e6;
