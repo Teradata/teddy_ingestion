@@ -1,6 +1,6 @@
-TargetTdpId     = 'dbt-tests-wteuh1djm0q9u4x5.env.clearscape.teradata.com',
-TargetUserName  = 'demo_user',
-TargetUserPassword = 'dbtTest#01',
+TargetTdpId     = <YOUR HOST>,
+TargetUserName  = <YOUR USER>,
+TargetUserPassword = <YOUR PASSWORD>,
 
 FileReaderDirectoryPath = '../data'
 FileReaderFileName      = 'split_*.csv'
