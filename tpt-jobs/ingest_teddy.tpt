@@ -1,0 +1,89 @@
+DEFINE JOB file_load
+DESCRIPTION 'Load data from CSV files into Teradata'
+(
+  /*
+    Define the schema of the data in the csv file
+  */
+  DEFINE SCHEMA TEDDY_SCHEMA (
+    transaction_id      VARCHAR(50),
+    order_id            VARCHAR(10),
+    product_id          VARCHAR(10),
+    product_quantity    VARCHAR(50),
+    customer_id         VARCHAR(50),
+    order_status        VARCHAR(50),
+    order_date          VARCHAR(10),
+    name_customer       VARCHAR(50),
+    surname             VARCHAR(50),
+    email               VARCHAR(50),
+    name_product        VARCHAR(50),
+    price_cents         VARCHAR(50)
+  );
+
+  /*
+    In the first step, we are sending statements to remove old tables
+    and create a new one.
+  */
+
+  STEP st_Setup_Tables
+  (
+    APPLY
+      ('DROP TABLE ' || @LoadLogTable || ';'),
+      ('DROP TABLE ' || @LoadErrorTable1 || ';'),
+      ('DROP TABLE ' || @LoadErrorTable2 || ';'),
+      ('DROP TABLE ' || @LoadTargetTable || ';'),
+      ('CREATE TABLE ' || @LoadTargetTable || ' (
+        transaction_id      INTEGER,
+        order_id            INTEGER,
+        product_id          INTEGER,
+        product_quantity    INTEGER,
+        customer_id         INTEGER,
+        order_status        VARCHAR(50),
+        order_date          DATE,
+        name_customer       VARCHAR(50),
+        surname             VARCHAR(50),
+        email               VARCHAR(50),
+        name_product        VARCHAR(50),
+        price_cents         INTEGER
+      )
+      PRIMARY INDEX ( transaction_id );')
+    TO OPERATOR ($DDL);
+  );
+
+  /*
+    Finally, in this step we read the data from the file operator
+    and send it to the load operator.
+  */
+  STEP st_Load_File
+  (
+    APPLY
+      ('INSERT INTO ' || @LoadTargetTable || ' (
+        transaction_id,
+        order_id,
+        product_id,
+        product_quantity,
+        customer_id,
+        order_status,
+        order_date,
+        name_customer,
+        surname,
+        email,
+        name_product,
+        price_cents
+      ) VALUES (
+        :transaction_id,
+        :order_id,
+        :product_id,
+        :product_quantity,
+        :customer_id,
+        :order_status,
+        :order_date,
+        :name_customer,
+        :surname,
+        :email,
+        :name_product,
+        :price_cents
+      );')
+    TO OPERATOR ($LOAD)
+    SELECT * FROM OPERATOR($FILE_READER(TEDDY_SCHEMA));
+  );
+);

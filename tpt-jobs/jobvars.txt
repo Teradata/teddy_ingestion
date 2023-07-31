@@ -1,0 +1,17 @@
+TargetTdpId     = 'dbt-tests-wteuh1djm0q9u4x5.env.clearscape.teradata.com',
+TargetUserName  = 'demo_user',
+TargetUserPassword = 'dbtTest#01',
+
+FileReaderDirectoryPath = '../data'
+FileReaderFileName      = 'split_*.csv'
+FileReaderFormat        = 'Delimited'
+FileReaderOpenMode      = 'Read'
+FileReaderTextDelimiter = ','
+FileReaderSkipRows      = 1
+
+DDLErrorList = '3807'
+
+LoadLogTable    = 'teddy_ingestion.teddy_ingestion_lg'
+LoadErrorTable1 = 'teddy_ingestion.teddy_ingestion_et'
+LoadErrorTable2 = 'teddy_ingestion.teddy_ingestion_uv'
+LoadTargetTable     = 'teddy_ingestion.online_store',
