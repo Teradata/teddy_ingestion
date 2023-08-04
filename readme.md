@@ -36,42 +36,36 @@ AS PERMANENT = 110e6;
 ```
 
 ### Loading Data Stored Locally:
-* For loading the data that is stored locally, we are going to use Teradata Parallel Transporter, TPT, TPT is a powerful dataloading tool that is client based, thus very efficient to load data from a local server, it also allows parallelization which can make the process more efficient.
-* TPT is highly configurable and robust, so it is worth to take a look at its full documentation and reference guide for advanced use cases. [TPT Documentation can be found in Teradata's website.](https://docs.teradata.com/r/k_KCYzsgJJ_t2du~c~wK_Q/OkTPh7PBa4ICuyi45jJsgQ)
-* TPT operations are based in highly configurable operators that allow the parallelization of Reading Operations (Producer Operators), Writing Operations (Consumer Operators), Loading, and Filtering Operations (Filter Operators). The TPT package comes with preconfigured operators for loading data, writing to files, etc. You can find those under the ./templates directory located inside the directorey where TPT was installed.
-* TPT jobs are configured through TPT scripts, in our case the `tpt-jobs` folder, contains the script that defines our corresponding job.
-* It is a best practice to define environment variables used by our TPT jobs in a jobvars.txt file.
-    - The environment variables define things such as the parameter of our database connections.
-        - The host, user, and password of our ClearScape Analytics Environment in our case.
-    - The configuration of our inputs.
-        - Location of the files that will be ingested, their format, delimiters, etc.
-    - The tables that we will be using to load the data and record logs.
-* Our TPT job script is integrated of the following elements.
-    - A description.
-    - The schema of the files that are being loaded.
-    - Data Definition commands to create the tables that will be used.
-    - The file reading operation.
-    - The loading operation.
-* To run the TPT job we execute the following command from the terminal. Due to the relative paths it is necessary to be located inside the directory that contains the job definition file:
+
+### Loading Data Stored Locally:
+* For loading the data that is stored locally, we are going to use Teradata Parallel Transporter (TPT). TPT is a powerful data-loading tool that is client-based, thus very efficient for loading data from a local server. It also allows parallelization, which can make the process more efficient.
+* TPT is highly configurable and robust, so it is worth taking a look at its full documentation and reference guide for advanced use cases. [TPT Documentation can be found on Teradata's website.](https://docs.teradata.com/r/k_KCYzsgJJ_t2du~c~wK_Q/OkTPh7PBa4ICuyi45jJsgQ)
+* TPT operations are based on highly configurable operators that allow the parallelization of Reading Operations (Producer Operators), Writing Operations (Consumer Operators), Loading, and Filtering Operations (Filter Operators). The TPT package comes with preconfigured operators for loading data, writing to files, etc. You can find those under the `./templates` directory located inside the directory where TPT was installed.
+* TPT jobs are configured through TPT scripts. In our case, the `tpt-jobs` folder contains the script that defines our corresponding job.
+* It is a best practice to define environment variables used by our TPT jobs in a `jobvars.txt` file.
+  - The environment variables define things such as the parameters of our database connections.
+  - For example, the host, user, and password of our ClearScape Analytics Environment in our case.
+  - The configuration of our inputs, like the location of the files that will be ingested, their format, delimiters, etc.
+  - The tables that we will be using to load the data and record logs.
+* Our TPT job script is integrated with the following elements.
+  - A description.
+  - The schema of the files that are being loaded.
+  - Data Definition commands to create the tables that will be used.
+  - The file reading operation.
+  - The loading operation.
+* To run the TPT job, we execute the following command from the terminal. Due to the relative paths, it is necessary to be located inside the directory that contains the job definition file:
 ```
-tbuild -f ingest_teddy.tpt -v jobvars.txt -j file_load_new
+tbuild -f ingest_teddy.tpt -v jobvars.txt -j file_load
 ```
-* In this command, -f stands for the job definition file, -v for the file that contains the environment variables of the job, and -j the job.
+* In this command, `-f` stands for the job definition file, `-v` for the file that contains the environment variables of the job, and `-j` for the job.
 * It is possible to add several instances of an operator as follows, where `n` stands for the number of instances of the operator:
-    `TO OPERATOR ($LOAD)[n]`
-    `$FILE_READER(TEDDY_SCHEMA)[n]`
-* The addition of several instances allow for parallelization of the operations.
+  - `TO OPERATOR ($LOAD)[n]`
+  - `$FILE_READER(TEDDY_SCHEMA)[n]`
+* The addition of several instances allows for the parallelization of the operations.
 
 ### Loading Data Stored in the Cloud:
-* For laoding data from cloud block storage we wil use Native Object Storage (NOS). NOS is optimized for ingesting block storage data Cloud Storage. 
-* NOS allows to execute SQL statements against block storage sources. 
-* The files in the `nos-scripts` folder contains scripts to bring the data from Cloud Storage fulfilling the business requirements.
-    - The `ingest_visits` script performs are inner join of the physical storage visits data with the online store data on the `customer_id`. This fulfills the requirement of retrieving data from the physical store that corresponds to customers that bought online.
-    - The `ingest_visit_products` script ingests the `visit_products` data also performing an inner join with the already ingested visits data. This is also to fulfill the business requirement of retrieving data from the physical store that corresponds to customers that bought online.
-
-
-
-
-
-
-
+* For loading data from cloud block storage, we will use Native Object Storage (NOS). NOS is optimized for ingesting block storage data in Cloud Storage.
+* NOS allows executing SQL statements against block storage sources.
+* The files in the `nos-scripts` folder contain scripts to bring the data from Cloud Storage fulfilling the business requirements.
+  - The `ingest_visits` script performs an inner join of the physical storage visits data with the online store data on the `customer_id`. This fulfills the requirement of retrieving data from the physical store that corresponds to customers who bought online.
+  - The `ingest_visit_products` script ingests the `visit_products` data, also performing an inner join with the already ingested visits data. This is also to fulfill the business requirement of retrieving data from the physical store that corresponds to customers who bought online.
