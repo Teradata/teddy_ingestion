@@ -1,0 +1,115 @@
+DEFINE JOB file_load
+DESCRIPTION 'Load data from CSV files into Teradata'
+(
+  DEFINE SCHEMA TEDDY_SCHEMA (
+    transaction_id      VARCHAR(50),
+    order_id            VARCHAR(10),
+    product_id          VARCHAR(10),
+    product_quantity    VARCHAR(50),
+    customer_id         VARCHAR(50),
+    order_status        VARCHAR(50),
+    order_date          VARCHAR(10),
+    name_customer       VARCHAR(50),
+    surname             VARCHAR(50),
+    email               VARCHAR(50),
+    name_product        VARCHAR(50),
+    price_cents         VARCHAR(50)
+  );
+
+  DEFINE OPERATOR DDL_OPERATOR
+  TYPE DDL
+  ATTRIBUTES
+  (
+    VARCHAR TdpId        = @TargetTdpId,
+    VARCHAR UserName     = @TargetUserName,
+    VARCHAR UserPassword = @TargetUserPassword,
+    VARCHAR ErrorList    = @DDLErrorList
+  );
+
+  DEFINE OPERATOR FILE_READER
+  TYPE DATACONNECTOR PRODUCER
+  SCHEMA TEDDY_SCHEMA
+  ATTRIBUTES
+  (
+    VARCHAR DirectoryPath = @FileReaderDirectoryPath,
+    VARCHAR FileName      = @FileReaderFileName,
+    VARCHAR Format        = @FileReaderFormat,
+    VARCHAR OpenMode      = @FileReaderOpenMode,
+    VARCHAR TextDelimiter = @FileReaderTextDelimiter,
+    INTEGER SkipRows      = @FileReaderSkipRows
+  );
+
+  DEFINE OPERATOR LOAD_OPERATOR
+  TYPE LOAD
+  SCHEMA TEDDY_SCHEMA
+  ATTRIBUTES
+  (
+    VARCHAR TdpId        = @TargetTdpId,
+    VARCHAR UserName     = @TargetUserName,
+    VARCHAR UserPassword = @TargetUserPassword,
+    VARCHAR TargetTable  = @LoadTargetTable,
+    VARCHAR LogTable     = @LoadLogTable,
+    VARCHAR ErrorTable1  = @LoadErrorTable1,
+    VARCHAR ErrorTable2  = @LoadErrorTable2,
+    VARCHAR ErrorList    = @DDLErrorList
+  );
+
+  STEP st_Setup_Tables
+  (
+    APPLY
+      ('DROP TABLE ' || @LoadLogTable || ';'),
+      ('DROP TABLE ' || @LoadErrorTable1 || ';'),
+      ('DROP TABLE ' || @LoadErrorTable2 || ';'),
+      ('DROP TABLE ' || @LoadTargetTable || ';'),
+      ('CREATE TABLE ' || @LoadTargetTable || ' (
+        transaction_id      INTEGER,
+        order_id            INTEGER,
+        product_id          INTEGER,
+        product_quantity    INTEGER,
+        customer_id         INTEGER,
+        order_status        VARCHAR(10) CHARACTER SET LATIN NOT CASESPECIFIC,
+        order_date          DATE,
+        name_customer       VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC,
+        surname             VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC,
+        email               VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC,
+        name_product        VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC,
+        price_cents         INTEGER
+      )
+      PRIMARY INDEX ( transaction_id );')
+    TO OPERATOR (DDL_OPERATOR);
+  );
+  
+  STEP st_Load_File
+  (
+    APPLY
+      ('INSERT INTO ' || @LoadTargetTable || ' (
+        transaction_id,
+        order_id,
+        product_id,
+        product_quantity,
+        customer_id,
+        order_status,
+        order_date,
+        name_customer,
+        surname,
+        email,
+        name_product,
+        price_cents
+      ) VALUES (
+        :transaction_id,
+        :order_id,
+        :product_id,
+        :product_quantity,
+        :customer_id,
+        :order_status,
+        :order_date,
+        :name_customer,
+        :surname,
+        :email,
+        :name_product,
+        :price_cents
+      );')
+    TO OPERATOR (LOAD_OPERATOR)
+    SELECT * FROM OPERATOR(FILE_READER);
+  );
+);
