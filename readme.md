@@ -62,6 +62,7 @@ tbuild -f ingest_teddy.tpt -v jobvars.txt -j file_load
   - `TO OPERATOR ($LOAD)[n]`
   - `$FILE_READER(TEDDY_SCHEMA)[n]`
 * The addition of several instances allows for the parallelization of the operations.
+* The alternative file ingest_teddy_full.tpt is included as a reference of a TPT job that doesn't leverage included templates.
 
 ### Loading Data Stored in the Cloud:
 * For loading data from cloud block storage, we will use Native Object Storage (NOS). NOS is optimized for ingesting block storage data in Cloud Storage.
