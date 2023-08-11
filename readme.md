@@ -1,18 +1,18 @@
 # Teddy Retailers Ingestion Demo
 - Teddy Retailers operates both online and brick and mortar stores where it sells commonly used household products.
-- Teddy Retailers is planning to perform and in-depht analysis of activity in both it's online and physical stores. 
+- Teddy Retailers is planning to perform an in-depth analysis of activity in both its online and physical stores.
 
 ## Data
 The relevant data has been exported as flat CSV files as follows:
 * Local Server: Four separate CSV files with identical structure contain the data from the online store.
     - These files can be found in this repository in the ./data directory.
-* Google Cloud Storage: Two csv files have been extracted from the transactional system. These file contain the information about customers visits.
+* Google Cloud Storage: Two csv files have been extracted from the transactional system. These files contain the information about customers visits.
     - These files can be found in google cloud storage at the following URLs.
         - https://storage.googleapis.com/clearscape_analytics_demo_data/DEMO_TVUG_TPT_NOS/visits.csv
         - https://storage.googleapis.com/clearscape_analytics_demo_data/DEMO_TVUG_TPT_NOS/visit_products.csv
 
 ## Business Requirements 
-Data from both physical and online stores shall be ingested into Teddy's Teradata Vantage Database in the most efficient manner following the following requirements.
+Data from both physical and online stores shall be ingested into Teddy's Teradata Vantage Database in the most efficient manner following these requirements.
 * Online store 
     - All data from the Online Store shall be ingested. 
     - The data from each of the local files shall be ingested into the same table.
