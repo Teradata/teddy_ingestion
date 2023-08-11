@@ -6,7 +6,7 @@
 The relevant data has been exported as flat CSV files as follows:
 * Local Server: Four separate CSV files with identical structure contain the data from the online store.
     - These files can be found in this repository in the ./data directory.
-* Google Cloud Block Storage: Two csv files have been extracted from the transactional system. These file contain the information about customers visits.
+* Google Cloud Storage: Two csv files have been extracted from the transactional system. These file contain the information about customers visits.
     - These files can be found in google cloud storage at the following URLs.
         - https://storage.googleapis.com/clearscape_analytics_demo_data/DEMO_TVUG_TPT_NOS/visits.csv
         - https://storage.googleapis.com/clearscape_analytics_demo_data/DEMO_TVUG_TPT_NOS/visit_products.csv
@@ -65,8 +65,8 @@ tbuild -f ingest_teddy.tpt -v jobvars.txt -j file_load
 * The alternative file ingest_teddy_full.tpt is included as a reference of a TPT job that doesn't leverage included templates.
 
 ### Loading Data Stored in the Cloud:
-* For loading data from cloud block storage, we will use Native Object Storage (NOS). NOS is optimized for ingesting block storage data in Cloud Storage.
-* NOS allows executing SQL statements against block storage sources.
-* The files in the `nos-scripts` folder contain scripts to bring the data from Cloud Storage fulfilling the business requirements.
+* For loading data from cloud object storage, we will use Native Object Storage (NOS). NOS is optimized for ingesting object storage data in the cloud.
+* NOS allows executing SQL statements against object storage sources.
+* The files in the `nos-scripts` folder contain scripts to bring the data from Google Cloud Storage fulfilling the business requirements.
   - The `ingest_visits` script performs an inner join of the physical storage visits data with the online store data on the `customer_id`. This fulfills the requirement of retrieving data from the physical store that corresponds to customers who bought online.
   - The `ingest_visit_products` script ingests the `visit_products` data, also performing an inner join with the already ingested visits data. This is also to fulfill the business requirement of retrieving data from the physical store that corresponds to customers who bought online.
